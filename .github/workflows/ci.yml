@@ -41,12 +41,12 @@ jobs:
           name: reporte-pruebas
           path: reporte.txt
 
-      - name: Preparar archivos para despliegue
+      - name: Preparar archivos para GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
           path: '.'
 
-  deploy:
+  deploy-pages:
     needs: build-and-test
     runs-on: ubuntu-latest
     environment:
@@ -57,3 +57,16 @@ jobs:
       - name: Desplegar en GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  deploy-render:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Desplegar en Render
+        run: |
+          curl -X POST \
+            https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{}'
