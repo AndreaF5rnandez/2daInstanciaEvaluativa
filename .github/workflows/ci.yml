@@ -18,6 +18,8 @@ jobs:
     steps:
       - name: Obtener el codigo
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Instalar Python
         uses: actions/setup-python@v4
@@ -40,6 +42,16 @@ jobs:
         with:
           name: reporte-pruebas
           path: reporte.txt
+
+      - name: Analisis de SonarCloud
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.projectKey=AndreaF5rnandez_2daInstanciaEvaluativa
+            -Dsonar.organization=andreaf5rnandez
 
       - name: Preparar archivos para GitHub Pages
         if: github.ref == 'refs/heads/main'
