@@ -46,13 +46,25 @@ jobs:
       - name: Analisis de SonarCloud
         uses: SonarSource/sonarqube-scan-action@v6
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: https://sonarcloud.io
         with:
           args: >
             -Dsonar.projectKey=AndreaF5rnandez_2daInstanciaEvaluativa
             -Dsonar.organization=andreaf5rnandez
+
+      - name: Notificar fallo en Slack
+        if: failure()
+        uses: slackapi/slack-github-action@v1.27.0
+        with:
+          payload: |
+            {
+              "channel": "ci-cd-notificaciones",
+              "text": "❌ *Pipeline fallido* en `${{ github.repository }}`\n*Rama:* ${{ github.ref_name }}\n*Commit:* ${{ github.sha }}\n*Ver detalles:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
       - name: Preparar archivos para GitHub Pages
         if: github.ref == 'refs/heads/main'
@@ -73,6 +85,18 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
+      - name: Notificar deploy exitoso en Slack
+        uses: slackapi/slack-github-action@v1.27.0
+        with:
+          payload: |
+            {
+              "channel": "ci-cd-notificaciones",
+              "text": "✅ *Deploy exitoso en GitHub Pages*\n*Repositorio:* ${{ github.repository }}\n*URL:* https://andreaf5rnandez.github.io/2daInstanciaEvaluativa/"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
   deploy-render:
     if: github.ref == 'refs/heads/main'
     needs: build-and-test
@@ -86,3 +110,15 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
             -H "Content-Type: application/json" \
             -d '{}'
+
+      - name: Notificar deploy exitoso en Slack
+        uses: slackapi/slack-github-action@v1.27.0
+        with:
+          payload: |
+            {
+              "channel": "ci-cd-notificaciones",
+              "text": "✅ *Deploy exitoso en Render*\n*Repositorio:* ${{ github.repository }}\n*URL:* https://twodainstanciaevaluativa.onrender.com"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
