@@ -55,16 +55,10 @@ jobs:
 
       - name: Notificar fallo en Slack
         if: failure()
-        uses: slackapi/slack-github-action@v1.27.0
-        with:
-          payload: |
-            {
-              "channel": "ci-cd-notificaciones",
-              "text": "❌ *Pipeline fallido* en `${{ github.repository }}`\n*Rama:* ${{ github.ref_name }}\n*Commit:* ${{ github.sha }}\n*Ver detalles:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+        run: |
+          curl -X POST "${{ secrets.SLACK_WEBHOOK_URL }}" \
+            -H 'Content-type: application/json' \
+            --data "{\"text\":\"❌ *Pipeline fallido* en \`${{ github.repository }}\`\n*Rama:* ${{ github.ref_name }}\n*Ver detalles:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}"
 
       - name: Preparar archivos para GitHub Pages
         if: github.ref == 'refs/heads/main'
@@ -86,16 +80,10 @@ jobs:
         uses: actions/deploy-pages@v4
 
       - name: Notificar deploy exitoso en Slack
-        uses: slackapi/slack-github-action@v1.27.0
-        with:
-          payload: |
-            {
-              "channel": "ci-cd-notificaciones",
-              "text": "✅ *Deploy exitoso en GitHub Pages*\n*Repositorio:* ${{ github.repository }}\n*URL:* https://andreaf5rnandez.github.io/2daInstanciaEvaluativa/"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+        run: |
+          curl -X POST "${{ secrets.SLACK_WEBHOOK_URL }}" \
+            -H 'Content-type: application/json' \
+            --data '{"text":"✅ *Deploy exitoso en GitHub Pages*\nURL: https://andreaf5rnandez.github.io/2daInstanciaEvaluativa/"}'
 
   deploy-render:
     if: github.ref == 'refs/heads/main'
@@ -112,13 +100,7 @@ jobs:
             -d '{}'
 
       - name: Notificar deploy exitoso en Slack
-        uses: slackapi/slack-github-action@v1.27.0
-        with:
-          payload: |
-            {
-              "channel": "ci-cd-notificaciones",
-              "text": "✅ *Deploy exitoso en Render*\n*Repositorio:* ${{ github.repository }}\n*URL:* https://twodainstanciaevaluativa.onrender.com"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+        run: |
+          curl -X POST "${{ secrets.SLACK_WEBHOOK_URL }}" \
+            -H 'Content-type: application/json' \
+            --data '{"text":"✅ *Deploy exitoso en Render*\nURL: https://twodainstanciaevaluativa.onrender.com"}'
