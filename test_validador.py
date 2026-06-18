@@ -30,3 +30,8 @@ def test_multiples_errores():
     resultado = validar_contrasena("abc")
     assert resultado["valida"] == False
     assert len(resultado["errores"]) == 4
+
+def test_contrasena_vacia():
+    resultado = validar_contrasena("")
+    assert resultado["valida"] == False
+    assert "Debe tener al menos 8 caracteres" in resultado["errores"]
