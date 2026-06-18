@@ -4,7 +4,7 @@ def validar_contrasena(contrasena):
     if len(contrasena) < 8:
         errores.append("Debe tener al menos 8 caracteres")
 
-    
+    if not any(c.isupper() for c in contrasena):
         errores.append("Debe tener al menos una mayuscula")
 
     if not any(c.isdigit() for c in contrasena):
