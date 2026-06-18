@@ -30,7 +30,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Ejecutar pruebas automatizadas
-        run: pytest
+        run: pytest --cov=. --cov-report=xml
 
       - name: Guardar reporte de pruebas
         if: always()
@@ -52,6 +52,7 @@ jobs:
           args: >
             -Dsonar.projectKey=AndreaF5rnandez_2daInstanciaEvaluativa
             -Dsonar.organization=andreaf5rnandez
+            -Dsonar.python.coverage.reportPaths=coverage.xml
 
       - name: Notificar fallo en Slack
         if: failure()
